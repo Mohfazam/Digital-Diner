@@ -1,0 +1,1 @@
+import {Client, QueryResult} from 'pg'

@@ -10,6 +10,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/pg": "^8.11.14",
+    "mongoose": "^8.14.0",
+    "pg": "^8.15.6",
     "typescript": "^5.8.3"
   }
 }
