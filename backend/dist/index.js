@@ -17,12 +17,18 @@ const pg_1 = require("pg");
 const dotenv_1 = __importDefault(require("dotenv"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const MongoDB_1 = require("./models/MongoDB");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const PgDBURL = process.env.pgUrl;
 const JWT_SECRET = process.env.JWT_SECRET;
+const MONGO_URL = process.env.MONGO_URL;
 const pgClient = new pg_1.Client(PgDBURL);
+mongoose_1.default.connect(MONGO_URL).then(() => {
+    console.log("COnnected to the MongoDB");
+});
 pgClient.connect().then(() => { console.log("Connected to the Postgres DB"); });
 app.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password, phoneNumber } = req.body;
@@ -66,6 +72,49 @@ app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(500).json({
             error: "Login Failed"
+        });
+    }
+}));
+app.get("/items", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const allMenuItems = yield MongoDB_1.MenuItem.find({});
+        res.status(200).json({
+            msg: "Fetched items successfully",
+            items: allMenuItems
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            msg: "Failed to fetch menu itme"
+        });
+    }
+}));
+//@ts-ignore
+app.post("/menuItems", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name, category, price, description, image } = req.body;
+        if (!name || !category || !price) {
+            return res.status(200).json({
+                Error: "Missing required fields (name, category, price"
+            });
+        }
+        const newItem = new MongoDB_1.MenuItem({
+            name,
+            category,
+            price,
+            description: description || "Delicious item description coming soon",
+            image: image || "https://www.google.com/url?sa=i&url=https%3A%2F%2Fdribbble.com%2Fshots%2F4187820-404-Food-Not-Found&psig=AOvVaw3oXqAA8RhXZ0Nfx6fTNQqc&ust=1746026630776000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLDa_J_G_YwDFQAAAAAdAAAAABAE"
+        });
+        const savedItem = yield newItem.save();
+        res.status(201).json({
+            Message: "Menu Items Created Successfully",
+            item: savedItem
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: "Failed to create menu item"
         });
     }
 }));
