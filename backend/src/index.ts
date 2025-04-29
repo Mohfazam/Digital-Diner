@@ -3,6 +3,7 @@ import {Client, Query} from "pg";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from'jsonwebtoken';
+import { MenuItem } from "./models/MongoDB";
 
 dotenv.config();
 
@@ -77,6 +78,21 @@ app.post("/login", async (req, res) => {
     }
 })
 
+
+app.get("/items", async (req, res) => {
+    try{
+        const allMenuItems = await MenuItem.find({});
+
+        res.status(200).json({
+            msg: "Fetched items successfully",
+            items: allMenuItems
+        })
+    } catch(error){
+        res.status(500).json({
+            msg: "Failed to fetch menu itme"
+        });
+    }
+});
 
 
 
