@@ -130,7 +130,86 @@ app.post("/menuItems", async (req, res) => {
     }
 });
 
+//@ts-ignore
+app.post("/orders", async (req, res) => {
+    try{
+        const {phoneNumber, items, totalPrice} = req.body;
 
+        if (!phoneNumber || !items || !totalPrice) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        await pgClient.query("BEGIN");
+
+        const orderResult = await pgClient.query(
+            `INSERT INTO orders (phone_number, total_price)
+            VALUES ($1, $2) RETURNING id`, 
+            [phoneNumber, totalPrice]
+        );
+
+        const orderId = orderResult.rows[0].id;
+
+        for (const item of items) {
+            await pgClient.query(
+                `INSERT INTO order_items (order_id, item_name, price, quantity)
+                 VALUES ($1, $2, $3, $4)`,
+                [orderId, item.name, item.price, item.quantity]
+            );
+        }
+
+        await pgClient.query("COMMIT");
+
+        res.status(201).json({
+            Message: "Orders Placed Successfully",
+            orderId,
+            totalPrice
+        });
+
+    } catch(error){
+        await pgClient.query("ROLLBACK");
+        console.error("Order placement error:", error);
+        res.status(500).json({ 
+            success: false, 
+            error: "Order placement failed" 
+        });
+    }
+})
+
+
+app.get("/orders/:phone", async (req, res) => {
+    try {
+        const phoneNumber = req.params.phone;
+        
+        const result = await pgClient.query(`
+            SELECT 
+                o.id AS order_id,
+                o.total_price,
+                o.created_at,
+                json_agg(json_build_object(
+                    'item_name', oi.item_name,
+                    'price', oi.price,
+                    'quantity', oi.quantity
+                )) AS items
+            FROM orders o
+            JOIN order_items oi ON o.id = oi.order_id
+            WHERE o.phone_number = $1
+            GROUP BY o.id
+            ORDER BY o.created_at DESC
+        `, [phoneNumber]);
+
+        res.status(200).json({
+            success: true,
+            orders: result.rows
+        });
+
+    } catch (error) {
+        console.error("Order history error:", error);
+        res.status(500).json({ 
+            success: false, 
+            error: "Failed to fetch order history" 
+        });
+    }
+});
 
 app.listen(3000, () => {
     console.log("Server Started at the port 3000");
