@@ -93,6 +93,38 @@ app.get("/items", async (req, res) => {
         });
     }
 });
+//@ts-ignore
+app.post("/menuItems", async (req, res) => {
+    try{
+        const {name, category, price, description, image } = req.body;
+
+        if(!name || !category || !price){
+            return res.status(200).json({
+                Error: "Missing required fields (name, category, price"
+            });
+        }
+
+        const newItem = new MenuItem({
+            name, 
+            category,
+            price,
+            description: description || "Delicious item description coming soon",
+            image: image || "https://www.google.com/url?sa=i&url=https%3A%2F%2Fdribbble.com%2Fshots%2F4187820-404-Food-Not-Found&psig=AOvVaw3oXqAA8RhXZ0Nfx6fTNQqc&ust=1746026630776000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLDa_J_G_YwDFQAAAAAdAAAAABAE"
+        });
+
+        const savedItem = await newItem.save();
+
+        res.status(201).json({
+            Message: "Menu Items Created Successfully",
+            item: savedItem
+        });
+    } catch(error){
+        res.status(500).json({
+            success: false,
+            error: "Failed to create menu item"
+        });
+    }
+});
 
 
 

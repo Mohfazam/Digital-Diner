@@ -21,7 +21,7 @@ const menuItemsSchema = new mongoose.Schema({
     image: {
         type: String,
         required: true,
-        default: "https://via.placeholder.com/300x200.png?text=Food+Image"
+        default: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fdribbble.com%2Fshots%2F4187820-404-Food-Not-Found&psig=AOvVaw3oXqAA8RhXZ0Nfx6fTNQqc&ust=1746026630776000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLDa_J_G_YwDFQAAAAAdAAAAABAE"
     }
 });
 
