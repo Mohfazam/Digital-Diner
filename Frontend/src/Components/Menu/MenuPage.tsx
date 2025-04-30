@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PlusCircle, ShoppingBag, X, Lock, Utensils } from 'lucide-react';
+import { PlusCircle, ShoppingBag, X, Lock, Utensils, ImagePlus, DollarSign, LayoutGrid, TextCursorInput, Loader } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import MenuItem from './MenuItem';
 import CartItem from './CartItem';
 import AuthModal from './AuthModal';
 import { fetchMenuItems, placeOrder, addMenuItem } from './api';
-import { MenuItem as MenuItemType, CartItem as CartItemType, AddItemForm } from './index';
+import { MenuItem as MenuItemType, CartItem as CartItemType } from './types';
 
 const MenuPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,24 +18,28 @@ const MenuPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
-  const [addItemForm, setAddItemForm] = useState<AddItemForm>({
+  const [addItemForm, setAddItemForm] = useState({
     name: '',
     price: 0,
     description: '',
     image: '',
     category: 'Main Courses'
   });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Group items by category
+  const categorizedItems = menuItems.reduce((acc, item) => {
+    const category = item.category || 'Uncategorized';
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(item);
+    return acc;
+  }, {} as Record<string, MenuItemType[]>);
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      const adminStatus = localStorage.getItem('admin') === 'true';
-      setIsAdmin(adminStatus);
-      if (!token) setShowAuthModal(true);
-    };
-
-    checkAuth();
-    const loadMenuItems = async () => {
+    const adminStatus = localStorage.getItem('admin') === 'true';
+    setIsAdmin(adminStatus);
+    
+    const loadMenu = async () => {
       try {
         const items = await fetchMenuItems();
         setMenuItems(items);
@@ -45,10 +49,10 @@ const MenuPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-    loadMenuItems();
+    loadMenu();
   }, []);
 
-  // Cart Handlers
+  // Cart functions
   const handleAddToCart = (item: MenuItemType) => {
     setCartItems(prev => {
       const existing = prev.find(i => i._id === item._id);
@@ -69,7 +73,7 @@ const MenuPage: React.FC = () => {
     setCartItems(prev => prev.filter(item => item._id !== id));
   };
 
-  // Order Handling
+  // Order handling
   const handlePlaceOrder = async () => {
     if (!localStorage.getItem('token')) {
       setShowAuthModal(true);
@@ -95,7 +99,7 @@ const MenuPage: React.FC = () => {
     }
   };
 
-  // Admin Functions
+  // Admin functions
   const toggleAdminMode = () => {
     if (isAdmin) {
       localStorage.removeItem('admin');
@@ -106,25 +110,32 @@ const MenuPage: React.FC = () => {
     }
   };
 
+  // Add item form handling
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    if (!addItemForm.name) errors.name = 'Name is required';
+    if (addItemForm.price <= 0) errors.price = 'Price must be positive';
+    if (addItemForm.image && !isValidUrl(addItemForm.image)) {
+      errors.image = 'Invalid image URL';
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const isValidUrl = (url: string) => {
+    try { new URL(url); return true; }
+    catch { return false; }
+  };
+
   const handleAddMenuItem = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     try {
-      const newItem = await addMenuItem({
-        name: addItemForm.name,
-        category: addItemForm.category,
-        price: addItemForm.price,
-        description: addItemForm.description,
-        image: addItemForm.image
-      });
+      const newItem = await addMenuItem(addItemForm);
       setMenuItems(prev => [...prev, newItem]);
       setShowAddItemModal(false);
-      setAddItemForm({ 
-        name: '', 
-        price: 0, 
-        description: '', 
-        image: '', 
-        category: 'Main Courses' 
-      });
+      setAddItemForm({ name: '', price: 0, description: '', image: '', category: 'Main Courses' });
       toast.success(`${addItemForm.name} added to menu`);
     } catch (error) {
       toast.error('Failed to add menu item');
@@ -161,29 +172,28 @@ const MenuPage: React.FC = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Menu Section */}
-        <div className="lg:col-span-2">
-          <h2 className="text-xl font-semibold mb-6 text-gray-800">Our Menu</h2>
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="bg-gradient-to-r from-amber-50 to-amber-100 h-48 rounded-xl mb-4 animate-pulse" />
-                  <div className="h-4 bg-amber-100 rounded-full w-3/4 mb-3" />
-                  <div className="h-4 bg-amber-100 rounded-full w-1/2" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {menuItems.map(item => (
-                <MenuItem
-                  key={item._id}
-                  item={item}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
-            </div>
-          )}
+        <div className="lg:col-span-2 space-y-12">
+          {Object.entries(categorizedItems).map(([category, items]) => (
+            <motion.section 
+              key={category}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 border-amber-100">
+                {category}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* @ts-ignore */}
+                {items.map(item => (
+                  <MenuItem
+                    key={item._id}
+                    item={item}
+                    onAddToCart={handleAddToCart}
+                  />
+                ))}
+              </div>
+            </motion.section>
+          ))}
         </div>
 
         {/* Cart Section */}
@@ -250,50 +260,61 @@ const MenuPage: React.FC = () => {
             className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           >
             <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
               className="bg-white rounded-2xl w-full max-w-md shadow-xl"
             >
-              <div className="flex justify-between items-center p-4 border-b">
-                <h3 className="text-lg font-semibold">Add Menu Item</h3>
-                <button 
-                  onClick={() => setShowAddItemModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              <div className="bg-gradient-to-br from-amber-600 to-amber-700 p-6 text-white">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold">Add New Dish</h3>
+                  <button 
+                    onClick={() => setShowAddItemModal(false)}
+                    className="text-amber-100 hover:text-white"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
 
-              <form onSubmit={handleAddMenuItem} className="p-4 space-y-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Name</label>
+              <form onSubmit={handleAddMenuItem} className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <TextCursorInput className="w-4 h-4" />
+                    Dish Name
+                  </label>
                   <input
-                    required
                     value={addItemForm.name}
-                    onChange={e => setAddItemForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-xl bg-gray-50/50"
+                    onChange={(e) => setAddItemForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500"
                   />
+                  {formErrors.name && <p className="text-red-500 text-sm">{formErrors.name}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Price</label>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <DollarSign className="w-4 h-4" />
+                      Price
+                    </label>
                     <input
                       type="number"
                       step="0.01"
-                      required
                       value={addItemForm.price}
-                      onChange={e => setAddItemForm(prev => ({ ...prev, price: +e.target.value }))}
-                      className="w-full px-3 py-2 border rounded-xl bg-gray-50/50"
+                      onChange={(e) => setAddItemForm(prev => ({ ...prev, price: +e.target.value }))}
+                      className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500"
                     />
+                    {formErrors.price && <p className="text-red-500 text-sm">{formErrors.price}</p>}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Category</label>
+                  
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <LayoutGrid className="w-4 h-4" />
+                      Category
+                    </label>
                     <select
-                      required
                       value={addItemForm.category}
-                      onChange={e => setAddItemForm(prev => ({ ...prev, category: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded-xl bg-gray-50/50"
+                      onChange={(e) => setAddItemForm(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500"
                     >
                       <option value="Appetizers">Appetizers</option>
                       <option value="Main Courses">Main Courses</option>
@@ -303,22 +324,28 @@ const MenuPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Description</label>
-                  <textarea
-                    value={addItemForm.description}
-                    onChange={e => setAddItemForm(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-xl bg-gray-50/50"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Image URL</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <ImagePlus className="w-4 h-4" />
+                    Image URL
+                  </label>
                   <input
                     value={addItemForm.image}
-                    onChange={e => setAddItemForm(prev => ({ ...prev, image: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-xl bg-gray-50/50"
+                    onChange={(e) => setAddItemForm(prev => ({ ...prev, image: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500"
+                  />
+                  {formErrors.image && <p className="text-red-500 text-sm">{formErrors.image}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
+                  <textarea
+                    value={addItemForm.description}
+                    onChange={(e) => setAddItemForm(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500"
+                    rows={3}
                   />
                 </div>
 
@@ -334,7 +361,7 @@ const MenuPage: React.FC = () => {
                     type="submit"
                     className="px-4 py-2 bg-gradient-to-br from-amber-600 to-amber-700 text-white rounded-xl hover:shadow-lg"
                   >
-                    Add Item
+                    Add Dish
                   </button>
                 </div>
               </form>
