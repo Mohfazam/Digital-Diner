@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PlusCircle, ShoppingBag, X, Lock, Utensils, ImagePlus, DollarSign, LayoutGrid, TextCursorInput, Loader } from 'lucide-react';
+import { PlusCircle, ShoppingBag, X, Lock, Utensils, ImagePlus, DollarSign, LayoutGrid, TextCursorInput } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import MenuItem from './MenuItem';
 import CartItem from './CartItem';
 import AuthModal from './AuthModal';
 import { fetchMenuItems, placeOrder, addMenuItem } from './api';
-import { MenuItem as MenuItemType, CartItem as CartItemType } from './types';
+import { MenuItem as MenuItemType, CartItem as CartItemType } from './index';
 
 const MenuPage: React.FC = () => {
   const navigate = useNavigate();
