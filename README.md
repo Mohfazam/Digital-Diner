@@ -1,11 +1,11 @@
-# The Digital Diner - Restaurant Ordering System
+# 🍽️ The Digital Diner - Restaurant Ordering System
 
-![Demo](digital-diner-snowy.vercel.app) 
+[![Demo](https://img.shields.io/badge/Demo-Live%20Site-success)](https://digital-diner-snowy.vercel.app)
 ![Stack](https://img.shields.io/badge/Stack-MERN%20%2B%20PostgreSQL-blue)
 
 A full-stack web application for managing restaurant orders, built with MongoDB, Express, React, Node.js, and PostgreSQL.
 
-## Table of Contents
+## 📋 Table of Contents
 - [Features](#features)
 - [Deployment](#deployment)
 - [Database Design](#database-design)
@@ -14,24 +14,19 @@ A full-stack web application for managing restaurant orders, built with MongoDB,
 - [Assumptions & Challenges](#assumptions--challenges)
 - [License](#license)
 
----
-
-## Features
+## ✨ Features
 - **Menu Browsing**: View items by category (Appetizers, Mains, Desserts, Beverages)
 - **Cart Management**: Add/remove items, adjust quantities, calculate totals
 - **Order Placement**: Submit orders with phone number validation
 - **Order History**: Retrieve past orders using phone number
 - **Admin Panel**: Add menu items (MongoDB) and view all orders (PostgreSQL)
 
----
-
-## Deployment
-- **Frontend**: [Netlify](https://digital-diner.netlify.app)
+## 🚀 Deployment
+- **Frontend**: [Vercel](https://digital-diner-snowy.vercel.app)
 - **Backend**: Hosted on Render (or localhost for development)
 
----
+## 💾 Database Design
 
-## Database Design
 ### MongoDB (Menu Data)
 ```javascript
 // menuItems Schema
@@ -42,10 +37,11 @@ A full-stack web application for managing restaurant orders, built with MongoDB,
   description: String,
   image: String
 }
-Justification: Chosen for flexible schema to accommodate evolving menu details and unstructured data.
+```
+**Justification**: Chosen for flexible schema to accommodate evolving menu details and unstructured data.
 
-PostgreSQL (Order Data)
-sql
+### PostgreSQL (Order Data)
+```sql
 CREATE TABLE orders (
   id SERIAL PRIMARY KEY,
   phone_number VARCHAR(20) NOT NULL,
@@ -59,81 +55,83 @@ CREATE TABLE order_items (
   price DECIMAL(10,2) NOT NULL,
   quantity INTEGER NOT NULL
 );
-Justification: PostgreSQL handles transactional data better with ACID compliance for orders.
+```
+**Justification**: PostgreSQL handles transactional data better with ACID compliance for orders.
 
-Setup Instructions
-Prerequisites
-Node.js v18+
+## 🔧 Setup Instructions
 
-MongoDB Atlas account
+### Prerequisites
+- Node.js v18+
+- MongoDB Atlas account
+- PostgreSQL 15+
 
-PostgreSQL 15+
-
-Backend Setup
-Clone repository:
-
-bash
+### Backend Setup
+1. Clone repository:
+```bash
 git clone https://github.com/yourusername/digital-diner.git
 cd backend
-Install dependencies:
+```
 
-bash
+2. Install dependencies:
+```bash
 npm install
-Create .env file:
+```
 
-env
+3. Create `.env` file:
+```
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/diner
 PGUSER=postgres
 PGPASSWORD=postgres
 PGHOST=localhost
 PGDATABASE=diner
 JWT_SECRET=your_secret_key
-Start server:
+```
 
-bash
+4. Start server:
+```bash
 npm run dev
-Frontend Setup
-Navigate to frontend:
+```
 
-bash
+### Frontend Setup
+1. Navigate to frontend:
+```bash
 cd ../frontend
 npm install
-Start development server:
+```
 
-bash
+2. Start development server:
+```bash
 npm run dev
-API Endpoints
-Method	Endpoint	Description	Auth Required
-GET	/api/items	Get all menu items	No
-POST	/api/orders	Create new order	No
-GET	/api/orders/:phone	Get orders by phone number	No
-POST	/api/menuItems	Add new menu item (Admin)	JWT
-GET	/api/admin/orders	Get all orders (Admin)	JWT
-Assumptions & Challenges
-Assumptions
-Phone number used as primary user identifier
+```
 
-No real-time inventory management
+## 🔌 API Endpoints
 
-Simplified admin auth using localStorage
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|--------------|
+| GET | `/api/items` | Get all menu items | No |
+| POST | `/api/orders` | Create new order | No |
+| GET | `/api/orders/:phone` | Get orders by phone number | No |
+| POST | `/api/menuItems` | Add new menu item (Admin) | JWT |
+| GET | `/api/admin/orders` | Get all orders (Admin) | JWT |
 
-Menu items don't require versioning
+## 🤔 Assumptions & Challenges
 
-Challenges
-Coordinating MongoDB+PostgreSQL transactions
+### Assumptions
+- Phone number used as primary user identifier
+- No real-time inventory management
+- Simplified admin auth using localStorage
+- Menu items don't require versioning
 
-Cart state persistence across React components
+### Challenges
+- Coordinating MongoDB+PostgreSQL transactions
+- Cart state persistence across React components
+- CORS configuration for Netlify deployment
+- PostgreSQL schema optimization for order history
 
-CORS configuration for Netlify deployment
+### AI Tools Used
+- GitHub Copilot for boilerplate code
+- ChatGPT for debugging assistance
+  (All generated code was reviewed and understood)
 
-PostgreSQL schema optimization for order history
-
-AI Tools Used
-GitHub Copilot for boilerplate code
-
-ChatGPT for debugging assistance
-(All generated code was reviewed and understood)
-
-License
+## 📄 License
 MIT License - See LICENSE for details.
-
