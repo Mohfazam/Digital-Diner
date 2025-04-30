@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast, Toaster } from 'react-hot-toast';
 import { PlusCircle, ShoppingBag, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import MenuItem from './MenuItem';
 import CartItem from './CartItem';
 import AuthModal from './AuthModal';
+import AllOrdersTab from './AllOrdersTab';
 import { MenuItem as MenuItemType, CartItem as CartItemType, AddItemForm } from './index';
 import { fetchMenuItems, placeOrder, addMenuItem } from './api';
 
@@ -15,6 +17,8 @@ const MenuPage: React.FC = () => {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [activeTab, setActiveTab] = useState<'menu' | 'cart' | 'orders'>('menu');
   const [addItemForm, setAddItemForm] = useState<AddItemForm>({
     name: '',
     price: 0,
@@ -22,6 +26,12 @@ const MenuPage: React.FC = () => {
     image: '',
     category: 'main'
   });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const adminStatus = localStorage.getItem('admin') === 'true';
+    setIsAdmin(adminStatus);
+  }, []);
 
   useEffect(() => {
     const loadMenuItems = async () => {
@@ -115,14 +125,53 @@ const MenuPage: React.FC = () => {
   };
 
   const toggleAdminMode = () => {
-    const isAdmin = localStorage.getItem('admin') === 'true';
-    localStorage.setItem('admin', isAdmin ? 'false' : 'true');
-    toast.success(`Admin mode ${isAdmin ? 'disabled' : 'enabled'}`);
-    setMenuItems([...menuItems]);
+    if (isAdmin) {
+      localStorage.removeItem('admin');
+      setIsAdmin(false);
+      toast.success('Admin mode disabled');
+    } else {
+      navigate('/AdminLogin');
+    }
   };
 
   const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const isAdmin = localStorage.getItem('admin') === 'true';
+
+  const renderTabs = () => (
+    <div className="flex gap-4 mb-6 px-8 border-b border-gray-100 pb-4">
+      <button
+        onClick={() => setActiveTab('menu')}
+        className={`px-4 py-2 rounded-lg font-medium ${
+          activeTab === 'menu' 
+            ? 'bg-amber-600 text-white' 
+            : 'text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        Menu
+      </button>
+      
+      <button
+        onClick={() => setActiveTab('cart')}
+        className={`px-4 py-2 rounded-lg font-medium ${
+          activeTab === 'cart'
+            ? 'bg-amber-600 text-white'
+            : 'text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        Cart ({cartItems.length})
+      </button>
+
+      <button
+        onClick={() => setActiveTab('orders')}
+        className={`px-4 py-2 rounded-lg font-medium ${
+          activeTab === 'orders'
+            ? 'bg-amber-600 text-white'
+            : 'text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        All Orders
+      </button>
+    </div>
+  );
 
   return (
     <div className="relative min-h-screen bg-gray-50">
@@ -135,9 +184,10 @@ const MenuPage: React.FC = () => {
           {isAdmin ? 'Disable Admin' : 'Enable Admin'}
         </button>
       </div>
-      
-      <div className="flex">
-        {/* Menu List */}
+
+      {renderTabs()}
+
+      {activeTab === 'menu' && (
         <div className="flex-1 pr-0 sm:pr-[350px]">
           <div className="w-full max-w-7xl mx-auto pb-24">
             <h2 className="text-3xl font-bold text-gray-800 mb-8 px-8">Our Menu</h2>
@@ -172,8 +222,9 @@ const MenuPage: React.FC = () => {
             )}
           </div>
         </div>
-        
-        {/* Cart Sidebar */}
+      )}
+
+      {activeTab === 'cart' && (
         <motion.div 
           initial={{ x: 350 }}
           animate={{ x: 0 }}
@@ -239,8 +290,10 @@ const MenuPage: React.FC = () => {
             </button>
           </div>
         </motion.div>
-      </div>
-      
+      )}
+
+      {activeTab === 'orders' && <AllOrdersTab />}
+
       {/* Admin Add Item Modal */}
       {showAddItemModal && (
         <motion.div
@@ -408,4 +461,4 @@ const MenuPage: React.FC = () => {
   );
 };
 
-export default MenuPage
+export default MenuPage;

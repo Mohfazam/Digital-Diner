@@ -7,6 +7,7 @@ import {Landing} from './Components/Landing/Landing';
 import MenuPage from "./Components/Menu/MenuPage"
 import Signup from "./Components/Auth/Signup";
 import Login from "./Components/Auth/Login";
+import AdminLogin from "./Components/Auth/AdminLogin";
 
 
   const router = createBrowserRouter([
@@ -25,6 +26,10 @@ import Login from "./Components/Auth/Login";
     {
       path: "/Login",
       element: <Login />
+    },
+    {
+      path: "/AdminLogin",
+      element: <AdminLogin />
     },
   ])
 

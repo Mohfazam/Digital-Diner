@@ -197,7 +197,40 @@ app.post("/orders", async (req, res) => {
             error: "Order placement failed" 
         });
     }
-})
+});
+
+app.get("/orders", async (req, res) => {
+    try {
+      const result = await pgClient.query(`
+        SELECT 
+          o.id AS order_id,
+          o.phone_number,
+          o.total_price,
+          o.created_at,
+          json_agg(json_build_object(
+            'item_name', oi.item_name,
+            'price', oi.price,
+            'quantity', oi.quantity
+          )) AS items
+        FROM orders o
+        JOIN order_items oi ON o.id = oi.order_id
+        GROUP BY o.id
+        ORDER BY o.created_at DESC
+      `);
+  
+      res.status(200).json({
+        success: true,
+        orders: result.rows
+      });
+  
+    } catch (error) {
+      console.error("Orders fetch error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to fetch orders" 
+      });
+    }
+  });
 
 
 app.get("/orders/:phone", async (req, res) => {
