@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Utensils, LogIn, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const Hero: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background image with overlay */}
@@ -66,6 +68,7 @@ export const Hero: React.FC = () => {
             </motion.button>
             
             <motion.button 
+            onClick={() => navigate('/Menu')}
               className="px-8 py-3 bg-white text-[#2B2D42] rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
