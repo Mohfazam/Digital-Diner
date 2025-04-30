@@ -15,6 +15,7 @@ const MenuPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
+  //@ts-ignore
   const [isLoading, setIsLoading] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
@@ -278,7 +279,8 @@ const MenuPage: React.FC = () => {
 
               <form onSubmit={handleAddMenuItem} className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+
+                  <label className="flex text-sm font-medium text-gray-700  items-center gap-2">
                     <TextCursorInput className="w-4 h-4" />
                     Dish Name
                   </label>
@@ -292,7 +294,7 @@ const MenuPage: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <DollarSign className="w-4 h-4" />
                       Price
                     </label>
@@ -307,7 +309,7 @@ const MenuPage: React.FC = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                       <LayoutGrid className="w-4 h-4" />
                       Category
                     </label>
@@ -325,7 +327,7 @@ const MenuPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <ImagePlus className="w-4 h-4" />
                     Image URL
                   </label>
