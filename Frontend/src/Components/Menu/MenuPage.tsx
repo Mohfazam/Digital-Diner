@@ -319,7 +319,7 @@ const MenuPage: React.FC = () => {
                       <option value="Appetizers">Appetizers</option>
                       <option value="Main Courses">Main Courses</option>
                       <option value="Desserts">Desserts</option>
-                      <option value="Beverages">Beverages</option>
+                      {/* <option value="Beverages">Beverages</option> */}
                     </select>
                   </div>
                 </div>
