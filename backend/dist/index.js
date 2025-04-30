@@ -52,6 +52,17 @@ app.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
+        // Admin credentials check
+        if (email === "Admin@Eatoes.com" && password === "Eatoes@123") {
+            const adminToken = jsonwebtoken_1.default.sign({ userId: "admin", role: "admin" }, JWT_SECRET, { expiresIn: '1h' });
+            return res.status(200).json({
+                msg: "Admin Logged in",
+                email,
+                token: adminToken,
+                role: "admin"
+            });
+        }
+        // Regular user flow
         const user = yield pgClient.query(`SELECT * FROM diner_users WHERE email = $1`, [email]);
         if (!user.rows[0]) {
             return res.status(404).json({
@@ -64,11 +75,12 @@ app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 error: "Invalid Password"
             });
         }
-        const token = jsonwebtoken_1.default.sign({ userId: user.rows[0].id }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jsonwebtoken_1.default.sign({ userId: user.rows[0].id, role: "user" }, JWT_SECRET, { expiresIn: '1h' });
         res.status(200).json({
             msg: "User Logged in",
             email,
-            token
+            token,
+            role: "user"
         });
     }
     catch (error) {

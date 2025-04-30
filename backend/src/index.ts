@@ -48,43 +48,63 @@ app.post("/signup", async (req, res) => {
 });
 //@ts-ignore
 app.post("/login", async (req, res) => {
-    try{
-        const {email, password} = req.body;
+    try {
+        const { email, password } = req.body;
+
+        // Admin credentials check
+        if (email === "Admin@Eatoes.com" && password === "Eatoes@123") {
+            const adminToken = jwt.sign(
+                { userId: "admin", role: "admin" },
+                JWT_SECRET!,
+                { expiresIn: '1h' }
+            );
+
+            return res.status(200).json({
+                msg: "Admin Logged in",
+                email,
+                token: adminToken,
+                role: "admin"
+            });
+        }
+
+        // Regular user flow
         const user = await pgClient.query(
             `SELECT * FROM diner_users WHERE email = $1`, [email]
         );
 
-        if(!user.rows[0]){
+        if (!user.rows[0]) {
             return res.status(404).json({
                 error: "User Not found"
-            })
+            });
         }
 
         const valid = await bcrypt.compare(password, user.rows[0].password_hash);
 
-        if(!valid){
+        if (!valid) {
             return res.status(401).json({
                 error: "Invalid Password"
             });
         }
 
         const token = jwt.sign(
-            {userId: user.rows[0].id},
+            { userId: user.rows[0].id, role: "user" },
             JWT_SECRET!,
-            {expiresIn: '1h'}
-        )
+            { expiresIn: '1h' }
+        );
 
         res.status(200).json({
             msg: "User Logged in",
             email,
-            token
+            token,
+            role: "user"
         });
-    } catch(error){
+
+    } catch (error) {
         res.status(500).json({
-            error:"Login Failed"
-        })
+            error: "Login Failed"
+        });
     }
-})
+});
 
 
 app.get("/items", async (req, res) => {
