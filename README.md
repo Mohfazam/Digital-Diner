@@ -1,6 +1,6 @@
 # The Digital Diner - Restaurant Ordering System
 
-![Demo](https://img.shields.io/badge/Demo-Netlify-green) 
+![Demo](digital-diner-snowy.vercel.app) 
 ![Stack](https://img.shields.io/badge/Stack-MERN%20%2B%20PostgreSQL-blue)
 
 A full-stack web application for managing restaurant orders, built with MongoDB, Express, React, Node.js, and PostgreSQL.
