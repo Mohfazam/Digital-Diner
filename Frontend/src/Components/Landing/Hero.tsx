@@ -1,54 +1,85 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Utensils, LogIn, Menu } from 'lucide-react';
 
-const Hero: React.FC = () => {
+export const Hero: React.FC = () => {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-neutral-900">
-      {/* Animated Gradient Background */}
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      {/* Background image with overlay */}
       <div 
-        className="absolute inset-0 bg-gradient-to-r from-accent/30 via-primary/20 to-accent/30 opacity-50"
-        style={{
-          backgroundSize: '400% 400%',
-          animation: 'gradient 15s ease infinite'
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: 'url(https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)',
+          backgroundPosition: 'center 30%'
         }}
-      />
-      
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-3xl">
-          {/* Glassmorphism Badge */}
-          <div className="inline-block mb-4 backdrop-blur-lg bg-white/5 rounded-lg border border-white/10 py-2 px-4">
-            <span className="text-white/80 text-sm">Welcome to the future of dining</span>
-          </div>
-          
-          {/* Main Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
-            <span className="text-white block">Experience</span>
-            <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent mt-2">
-              Digital Dining
-            </span>
-          </h1>
-          
-          {/* Subtext */}
-          <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
-            Where culinary excellence meets technological innovation. Order seamlessly, dine extraordinarily.
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4">
-            <button className="relative overflow-hidden bg-accent text-white font-medium py-3 px-6 md:py-4 md:px-8 rounded-full transition-all duration-300 hover:bg-accent-dark group">
-              Start Your Journey
-              <ArrowRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
-            </button>
-            
-            <button className="bg-white/10 backdrop-blur-sm text-white font-medium py-3 px-6 md:py-4 md:px-8 rounded-full transition-all duration-300 hover:bg-white/20 border border-white/20">
-              Explore Menu
-            </button>
-          </div>
-        </div>
+      >
+        <div className="absolute inset-0 bg-gray-900/60"></div>
       </div>
+      
+      <div className="container mx-auto px-6 sm:px-8 relative z-10 py-16 md:py-24">
+        <motion.div 
+          className="text-center max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.h1 
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Savor the Flavor, Order Online with Ease
+          </motion.h1>
+          
+          <motion.p 
+            className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Browse our curated menu, customize your order, and enjoy quick pickup at The Digital Diner.
+          </motion.p>
+          
+          <motion.div 
+            className="flex flex-col sm:flex-row justify-center gap-4 mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <motion.button 
+              className="px-8 py-3 bg-[#E63946] text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-[#d12836] transition-colors shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Utensils size={20} />
+              Sign Up
+            </motion.button>
+            
+            <motion.button 
+              className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-white/10 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <LogIn size={20} />
+              Sign In
+            </motion.button>
+            
+            <motion.button 
+              className="px-8 py-3 bg-white text-[#2B2D42] rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Menu size={20} />
+              View Menu
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      </div>
+      
+      {/* Decorative curve at the bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-white" style={{ clipPath: 'ellipse(75% 100% at 50% 100%)' }}></div>
     </section>
   );
 };
 
-export default Hero;

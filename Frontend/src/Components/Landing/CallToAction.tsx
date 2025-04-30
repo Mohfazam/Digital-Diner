@@ -1,54 +1,84 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
-const CallToAction: React.FC = () => {
+export const CallToAction: React.FC = () => {
   return (
-    <section className="relative py-16 md:py-24 bg-neutral-900 overflow-hidden">
-      {/* Animated Gradient */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-r from-accent/30 via-primary/20 to-accent/30 opacity-50"
-        style={{
-          backgroundSize: '400% 400%',
-          animation: 'gradient 15s ease infinite'
-        }}
-      />
-      
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-3xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-block mb-4 backdrop-blur-lg bg-white/5 rounded-lg border border-white/10 py-2 px-4">
-            <span className="text-white/80 text-sm">Get Started Today</span>
-          </div>
-
-          {/* Heading */}
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            <span className="text-white">Ready to </span>
-            <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
-              Transform Your Experience?
-            </span>
-          </h2>
-
-          {/* Subtext */}
-          <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
-            Join our community of food enthusiasts and tech-savvy diners.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button className="relative overflow-hidden bg-accent text-white font-medium py-3 px-6 md:py-4 md:px-8 rounded-full transition-all duration-300 hover:bg-accent-dark group w-full sm:w-auto">
-              Start Your Journey
-              <ArrowRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
-            </button>
+    <section className="py-24 bg-[#2B2D42] text-white">
+      <div className="container mx-auto px-6 sm:px-8">
+        <motion.div 
+          className="max-w-4xl mx-auto text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          <motion.h2 
+            className="text-3xl md:text-4xl font-bold mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
+            Ready to Taste the Future of Dining?
+          </motion.h2>
+          
+          <motion.p 
+            className="text-gray-300 mb-10 text-lg"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+          >
+            Join hundreds of satisfied customers today.
+          </motion.p>
+          
+          <motion.div 
+            className="flex flex-col items-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.6 }}
+          >
+            <motion.button 
+              className="px-8 py-3 bg-[#E63946] text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-[#d12836] transition-colors shadow-lg w-full sm:w-auto"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Get Started Now
+            </motion.button>
             
-            <button className="bg-white/10 backdrop-blur-sm text-white font-medium py-3 px-6 md:py-4 md:px-8 rounded-full transition-all duration-300 hover:bg-white/20 border border-white/20 w-full sm:w-auto">
-              View Sample Menu
-            </button>
+            <div className="mt-6 text-gray-300 flex flex-col sm:flex-row items-center justify-center gap-8 w-full">
+              <motion.a 
+                href="#" 
+                className="text-gray-300 hover:text-white transition-colors"
+                whileHover={{ scale: 1.05 }}
+              >
+                Already have an account? Sign In
+              </motion.a>
+              
+              <motion.a 
+                href="#" 
+                className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+                whileHover={{ x: 5 }}
+              >
+                Explore the Menu <ArrowRight size={16} />
+              </motion.a>
+            </div>
+          </motion.div>
+        </motion.div>
+        
+        <div className="mt-20 border-t border-gray-700 pt-8 text-center">
+          <div className="text-sm text-gray-400">
+            <p>© 2025 The Digital Diner. All rights reserved.</p>
+            <div className="flex justify-center gap-6 mt-4">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms</a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a>
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
 };
-
-export default CallToAction;
