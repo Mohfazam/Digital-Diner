@@ -50,6 +50,7 @@ export const Hero: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <motion.button 
+            onClick={() => navigate('/Signup')}
               className="px-8 py-3 bg-[#E63946] text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-[#d12836] transition-colors shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -59,6 +60,7 @@ export const Hero: React.FC = () => {
             </motion.button>
             
             <motion.button 
+              onClick={() => navigate('/Login')}
               className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-white/10 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
