@@ -1,38 +1,16 @@
-// MenuPage.tsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlusCircle, ShoppingBag, X, Lock, Utensils } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import MenuItem from './MenuItem';
 import CartItem from './CartItem';
 import AuthModal from './AuthModal';
 import { fetchMenuItems, placeOrder, addMenuItem } from './api';
-import { useNavigate } from 'react-router-dom';
-
-// Define the types that were imported from ./index
-interface MenuItemType {
-  _id: string;
-  name: string;
-  price: number;
-  description: string;
-  image: string;
-  category: string;
-}
-
-interface CartItemType extends MenuItemType {
-  quantity: number;
-}
-
-interface AddItemForm {
-  name: string;
-  price: number;
-  description: string;
-  image: string;
-  category: string;
-}
+import { MenuItem as MenuItemType, CartItem as CartItemType, AddItemForm } from './index';
 
 const MenuPage: React.FC = () => {
-    const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([]);
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -45,18 +23,20 @@ const MenuPage: React.FC = () => {
     price: 0,
     description: '',
     image: '',
-    category: 'main'
+    category: 'Main Courses'
   });
 
   useEffect(() => {
-    const adminStatus = localStorage.getItem('admin') === 'true';
-    setIsAdmin(adminStatus);
-  }, []);
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const adminStatus = localStorage.getItem('admin') === 'true';
+      setIsAdmin(adminStatus);
+      if (!token) setShowAuthModal(true);
+    };
 
-  useEffect(() => {
+    checkAuth();
     const loadMenuItems = async () => {
       try {
-        setIsLoading(true);
         const items = await fetchMenuItems();
         setMenuItems(items);
       } catch (error) {
@@ -68,6 +48,7 @@ const MenuPage: React.FC = () => {
     loadMenuItems();
   }, []);
 
+  // Cart Handlers
   const handleAddToCart = (item: MenuItemType) => {
     setCartItems(prev => {
       const existing = prev.find(i => i._id === item._id);
@@ -88,6 +69,7 @@ const MenuPage: React.FC = () => {
     setCartItems(prev => prev.filter(item => item._id !== id));
   };
 
+  // Order Handling
   const handlePlaceOrder = async () => {
     if (!localStorage.getItem('token')) {
       setShowAuthModal(true);
@@ -113,26 +95,39 @@ const MenuPage: React.FC = () => {
     }
   };
 
-  const handleAddMenuItem = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const newItem = await addMenuItem(addItemForm);
-      setMenuItems(prev => [...prev, newItem]);
-      setShowAddItemModal(false);
-      setAddItemForm({ name: '', price: 0, description: '', image: '', category: 'main' });
-      toast.success(`${addItemForm.name} added to menu`);
-    } catch (error) {
-      toast.error('Failed to add menu item');
-    }
-  };
-
+  // Admin Functions
   const toggleAdminMode = () => {
     if (isAdmin) {
       localStorage.removeItem('admin');
       setIsAdmin(false);
       toast.success('Admin mode disabled');
     } else {
-      Navigate('/adminlogin');;
+      navigate('/adminlogin');
+    }
+  };
+
+  const handleAddMenuItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const newItem = await addMenuItem({
+        name: addItemForm.name,
+        category: addItemForm.category,
+        price: addItemForm.price,
+        description: addItemForm.description,
+        image: addItemForm.image
+      });
+      setMenuItems(prev => [...prev, newItem]);
+      setShowAddItemModal(false);
+      setAddItemForm({ 
+        name: '', 
+        price: 0, 
+        description: '', 
+        image: '', 
+        category: 'Main Courses' 
+      });
+      toast.success(`${addItemForm.name} added to menu`);
+    } catch (error) {
+      toast.error('Failed to add menu item');
     }
   };
 
@@ -300,10 +295,10 @@ const MenuPage: React.FC = () => {
                       onChange={e => setAddItemForm(prev => ({ ...prev, category: e.target.value }))}
                       className="w-full px-3 py-2 border rounded-xl bg-gray-50/50"
                     >
-                      <option value="appetizer">Appetizer</option>
-                      <option value="main">Main Course</option>
-                      <option value="dessert">Dessert</option>
-                      <option value="beverage">Beverage</option>
+                      <option value="Appetizers">Appetizers</option>
+                      <option value="Main Courses">Main Courses</option>
+                      <option value="Desserts">Desserts</option>
+                      <option value="Beverages">Beverages</option>
                     </select>
                   </div>
                 </div>

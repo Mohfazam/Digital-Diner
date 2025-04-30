@@ -19,6 +19,7 @@ export const placeOrder = async (
   totalPrice: number
 ): Promise<void> => {
   try {
+    const token = localStorage.getItem('token');
     await axios.post(`${API_BASE_URL}/orders`, {
       phoneNumber,
       items: items.map(({ name, price, quantity }) => ({ 
@@ -27,6 +28,10 @@ export const placeOrder = async (
         quantity 
       })),
       totalPrice
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
   } catch (error) {
     console.error('Failed to place order:', error);
@@ -36,7 +41,13 @@ export const placeOrder = async (
 
 export const addMenuItem = async (item: Omit<MenuItem, '_id'>): Promise<MenuItem> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/items`, item);
+    const token = localStorage.getItem('token');
+    const response = await axios.post(`${API_BASE_URL}/menuItems`, item, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     return response.data.item;
   } catch (error) {
     console.error('Failed to add menu item:', error);
