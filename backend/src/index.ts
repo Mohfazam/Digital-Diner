@@ -5,16 +5,25 @@ import bcrypt from "bcrypt";
 import jwt from'jsonwebtoken';
 import mongoose from "mongoose"
 import { MenuItem } from "./models/MongoDB";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
+
 app.use(express.json());
+
+app.use(cors());
 
 const PgDBURL = process.env.pgUrl;
 const JWT_SECRET = process.env.JWT_SECRET;
 const MONGO_URL = process.env.MONGO_URL!;
 
+// app.use(cors({
+//     origin: ['http://localhost:5173', 'http://localhost:3000', 'https://dinerbackend.vercel.app'],
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 const pgClient = new Client(PgDBURL);
 mongoose.connect(MONGO_URL).then(() => {
     console.log("COnnected to the MongoDB");
